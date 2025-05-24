@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Coleta de Dados de Clones</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .form-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .form-group:hover {
+            border-color: #4facfe;
+            transform: translateY(-2px);
+        }
+
+        .form-group h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group h3::before {
+            content: "📋";
+            font-size: 1.5rem;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        label {
+            font-weight: 600;
+            color: #555;
+            min-width: 120px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .clone-section {
+            background: #f0f8ff;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .clone-section h4 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .data-input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(86, 171, 47, 0.4);
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%);
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .spreadsheet-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        .spreadsheet-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .spreadsheet-header h3 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        td {
+            padding: 12px 10px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        td:hover {
+            background: #f0f8ff;
+        }
+
+        .editable {
+            background: #fff3cd;
+        }
+
+        .editable:hover {
+            background: #ffeaa7;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 5px;
+            border: 2px solid #4facfe;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .floating-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .fab {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .form-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧬 Sistema de Coleta de Dados de Clones</h1>
+            <p>Interface intuitiva para coleta e exportação de dados experimentais</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Configurações Iniciais -->
+            <div class="form-section">
+                <div class="form-group">
+                    <h3>Configurações do Arquivo</h3>
+                    <div class="input-row">
+                        <label for="nomeArquivo">Nome do Arquivo:</label>
+                        <input type="text" id="nomeArquivo" placeholder="Ex: experimento_2024">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h3>Dados do Experimento</h3>
+                    <div class="input-row">
+                        <label for="ano">Ano (AAAA ou AA):</label>
+                        <input type="text" id="ano" placeholder="Ex: 2024 ou 24" maxlength="4">
+                    </div>
+                    <div class="input-row">
+                        <label for="pais">Código dos Pais:</label>
+                        <input type="text" id="pais" placeholder="Ex: 01" maxlength="2">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção de Adição de Clones -->
+            <div class="clone-section">
+                <h4>➕ Adicionar Novo Clone</h4>
+                <div class="input-row">
+                    <label for="numeroClone">Número do Clone:</label>
+                    <input type="text" id="numeroClone" placeholder="Ex: 001">
+                    <button class="btn btn-primary" onclick="adicionarClone()">Adicionar Clone</button>
+                </div>
+            </div>
+
+            <!-- Planilha de Dados -->
+            <div class="spreadsheet-container" id="spreadsheetContainer" style="display: none;">
+                <div class="spreadsheet-header">
+                    <h3>📊 Planilha de Dados em Tempo Real</h3>
+                    <p>Clique em qualquer célula para editar os valores</p>
+                </div>
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Clones</th>
+                            <th>Rep</th>
+                            <th>Peso g (casca+raiz)</th>
+                            <th>Nematoides totais</th>
+                            <th>Nema/g</th>
+                            <th>FR</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="statusMessage"></div>
+        </div>
+    </div>
+
+    <!-- Botões Flutuantes -->
+    <div class="floating-buttons">
+        <button class="fab btn-success" onclick="exportarExcel()" title="Exportar Excel">📥</button>
+        <button class="fab btn-primary" onclick="limparDados()" title="Limpar Dados">🗑️</button>
+    </div>
+
+    <script>
+        let dados = [];
+        let editingCell = null;
+
+        function formatarPeso(pesoStr) {
+            if (!pesoStr) return null;
+            
+            // Remove espaços e normaliza
+            pesoStr = pesoStr.trim();
+            
+            // Se já tem vírgula ou ponto, trata como decimal
+            if (pesoStr.includes(',') || pesoStr.includes('.')) {
+                try {
+                    const peso = parseFloat(pesoStr.replace(',', '.'));
+                    return isNaN(peso) ? null : peso;
+                } catch {
+                    return null;
+                }
+            }
+            
+            // Se é só números, precisa decidir se é gramas ou centigramas
+            if (pesoStr.match(/^\d+$/)) {
+                const numero = parseInt(pesoStr);
+                
+                // Se o número é maior que 999, provavelmente são centigramas (ex: 3295 = 32,95g)
+                if (numero > 999) {
+                    return numero / 100.0;
+                }
+                // Se é menor que 1000, provavelmente já são gramas (ex: 32 = 32g)
+                else {
+                    return numero;
+                }
+            }
+            
+            return null;
+        }
+
+        function gerarCodigoCompleto() {
+            const ano = document.getElementById('ano').value.trim();
+            const pais = document.getElementById('pais').value.trim();
+            
+            if (!ano || !pais) {
+                mostrarMensagem('Por favor, preencha o ano e código dos pais primeiro.', 'error');
+                return null;
+            }
+
+            const anoFinal = ano.length === 4 ? ano.slice(-2) : ano;
+            
+            if (anoFinal.length !== 2 || !anoFinal.match(/^\d{2}$/)) {
+                mostrarMensagem('Formato de ano inválido.', 'error');
+                return null;
+            }
+
+            if (pais.length !== 2 || !pais.match(/^\d{2}$/)) {
+                mostrarMensagem('Formato de código dos pais inválido.', 'error');
+                return null;
+            }
+
+            return anoFinal + pais;
+        }
+
+        function adicionarClone() {
+            const codigoBase = gerarCodigoCompleto();
+            if (!codigoBase) return;
+
+            const numeroClone = document.getElementById('numeroClone').value.trim();
+            if (!numeroClone) {
+                mostrarMensagem('Por favor, digite o número do clone.', 'error');
+                return;
+            }
+
+            const codigoCompleto = codigoBase + numeroClone;
+
+            // Criar modal para entrada de dados
+            criarModalEntradaDados(codigoCompleto);
+        }
+
+        function criarModalEntradaDados(codigoCompleto) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.8); display: flex; align-items: center;
+                justify-content: center; z-index: 2000;
+            `;
+
+            modal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 20px; max-width: 600px; width: 90%;">
+                    <h3 style="text-align: center; margin-bottom: 25px; color: #333;">
+                        📝 Dados para Clone: ${codigoCompleto}
+                    </h3>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="color: #555; margin-bottom: 15px;">⚖️ Pesos (g):</h4>
+                        <div class="data-grid">
+                            <input type="text" id="peso1" placeholder="Rep 1" class="data-input">
+                            <input type="text" id="peso2" placeholder="Rep 2" class="data-input">
+                            <input type="text" id="peso3" placeholder="Rep 3" class="data-input">
+                            <input type="text" id="peso4" placeholder="Rep 4" class="data-input">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="color: #555; margin-bottom: 15px;">🦠 Nematoides Totais:</h4>
+                        <div class="data-grid">
+                            <input type="text" id="nema1" placeholder="Rep 1" class="data-input">
+                            <input type="text" id="nema2" placeholder="Rep 2" class="data-input">
+                            <input type="text" id="nema3" placeholder="Rep 3" class="data-input">
+                            <input type="text" id="nema4" placeholder="Rep 4" class="data-input">
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; display: flex; gap: 15px; justify-content: center;">
+                        <button class="btn btn-success" onclick="salvarDadosClone('${codigoCompleto}', this.parentElement.parentElement.parentElement)">
+                            ✅ Salvar
+                        </button>
+                        <button class="btn" style="background: #6c757d; color: white;" onclick="this.parentElement.parentElement.parentElement.remove()">
+                            ❌ Cancelar
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        }
+
+        function salvarDadosClone(codigoCompleto, modal) {
+            const pesos = [
+                document.getElementById('peso1').value,
+                document.getElementById('peso2').value,
+                document.getElementById('peso3').value,
+                document.getElementById('peso4').value
+            ];
+
+            const nematoides = [
+                document.getElementById('nema1').value,
+                document.getElementById('nema2').value,
+                document.getElementById('nema3').value,
+                document.getElementById('nema4').value
+            ];
+
+            // Adicionar dados à tabela
+            for (let i = 0; i < 4; i++) {
+                const peso = formatarPeso(pesos[i]);
+                const nema = nematoides[i] && nematoides[i].match(/^\d+$/) ? parseInt(nematoides[i]) : null;
+                
+                dados.push({
+                    clone: codigoCompleto,
+                    rep: i + 1,
+                    peso: peso,
+                    nematoides: nema,
+                    nemaG: null,
+                    fr: null
+                });
+            }
+
+            atualizarTabela();
+            modal.remove();
+            document.getElementById('numeroClone').value = '';
+            mostrarMensagem(`Clone ${codigoCompleto} adicionado com sucesso!`, 'success');
+        }
+
+        function atualizarTabela() {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = '';
+
+            dados.forEach((item, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${item.clone}</td>
+                    <td>${item.rep}</td>
+                    <td class="editable" onclick="editarCelula(this, ${index}, 'peso')">${item.peso !== null ? item.peso : ''}</td>
+                    <td class="editable" onclick="editarCelula(this, ${index}, 'nematoides')">${item.nematoides !== null ? item.nematoides : ''}</td>
+                    <td>${item.nemaG !== null ? item.nemaG : ''}</td>
+                    <td>${item.fr !== null ? item.fr : ''}</td>
+                `;
+            });
+
+            document.getElementById('spreadsheetContainer').style.display = dados.length > 0 ? 'block' : 'none';
+        }
+
+        function editarCelula(cell, index, campo) {
+            if (editingCell) return;
+
+            editingCell = cell;
+            const valorAtual = dados[index][campo];
+            
+            const input = document.createElement('input');
+            input.className = 'edit-input';
+            input.value = valorAtual !== null ? valorAtual : '';
+            input.type = campo === 'nematoides' ? 'number' : 'text';
+
+            cell.innerHTML = '';
+            cell.appendChild(input);
+            input.focus();
+            input.select();
+
+            function finalizarEdicao() {
+                let novoValor = input.value.trim();
+                
+                if (campo === 'peso') {
+                    novoValor = formatarPeso(novoValor);
+                } else if (campo === 'nematoides') {
+                    novoValor = novoValor && novoValor.match(/^\d+$/) ? parseInt(novoValor) : null;
+                }
+
+                dados[index][campo] = novoValor;
+                cell.innerHTML = novoValor !== null ? novoValor : '';
+                editingCell = null;
+            }
+
+            input.addEventListener('blur', finalizarEdicao);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    finalizarEdicao();
+                }
+            });
+        }
+
+        function exportarExcel() {
+            if (dados.length === 0) {
+                mostrarMensagem('Nenhum dado para exportar.', 'error');
+                return;
+            }
+
+            const nomeArquivo = document.getElementById('nomeArquivo').value.trim() || 'dados_clones';
+            
+            // Preparar dados para exportação
+            const dadosExportacao = [
+                ['Clones', 'Rep', 'Peso g (casca+raiz)', 'Nematoides totais', 'Nema/g', 'FR']
+            ];
+
+            dados.forEach(item => {
+                dadosExportacao.push([
+                    item.clone,
+                    item.rep,
+                    item.peso,
+                    item.nematoides,
+                    item.nemaG,
+                    item.fr
+                ]);
+            });
+
+            // Criar workbook e worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(dadosExportacao);
+
+            // Estilizar cabeçalho
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                const address = XLSX.utils.encode_cell({ r: 0, c: C });
+                if (!ws[address]) continue;
+                ws[address].s = {
+                    font: { bold: true },
+                    alignment: { horizontal: 'center' }
+                };
+            }
+
+            // Ajustar largura das colunas
+            const colWidths = [
+                { wch: 15 }, // Clones
+                { wch: 8 },  // Rep
+                { wch: 20 }, // Peso
+                { wch: 18 }, // Nematoides
+                { wch: 12 }, // Nema/g
+                { wch: 8 }   // FR
+            ];
+            ws['!cols'] = colWidths;
+
+            XLSX.utils.book_append_sheet(wb, ws, 'Dados');
+            XLSX.writeFile(wb, `${nomeArquivo.replace(/\s+/g, '_')}.xlsx`);
+
+            mostrarMensagem('Arquivo Excel exportado com sucesso!', 'success');
+        }
+
+        function limparDados() {
+            if (confirm('⚠️ Tem certeza que deseja limpar todos os dados? Esta ação não pode ser desfeita.')) {
+                dados = [];
+                atualizarTabela();
+                mostrarMensagem('Dados limpos com sucesso!', 'success');
+            }
+        }
+
+        function mostrarMensagem(texto, tipo) {
+            const container = document.getElementById('statusMessage');
+            container.innerHTML = `<div class="status-message ${tipo}">${texto}</div>`;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 4000);
+        }
+
+        // Validação em tempo real
+        document.getElementById('ano').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+        document.getElementById('pais').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            mostrarMensagem('🚀 Sistema iniciado! Preencha as configurações e comece a adicionar clones.', 'success');
+        });
+    </script>
+</body>
+</html>
