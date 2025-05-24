@@ -5,331 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Coleta de Dados de Clones</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .main-content {
-            padding: 30px;
-        }
-
-        .form-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 15px;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .form-group:hover {
-            border-color: #4facfe;
-            transform: translateY(-2px);
-        }
-
-        .form-group h3 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .form-group h3::before {
-            content: "📋";
-            font-size: 1.5rem;
-        }
-
-        .input-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-
-        label {
-            font-weight: 600;
-            color: #555;
-            min-width: 120px;
-        }
-
-        input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #4facfe;
-            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
-        }
-
-        .clone-section {
-            background: #f0f8ff;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            border-left: 5px solid #4facfe;
-        }
-
-        .clone-section h4 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-        }
-
-        .data-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-
-        .data-grid-horizontal {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        @media (max-width: 640px) {
-            .data-grid-horizontal {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
-        }
-
-        .data-input {
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
-            color: white;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(86, 171, 47, 0.4);
-        }
-
-        .btn-export {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%);
-            color: white;
-            margin-left: 10px;
-        }
-
-        .btn-export:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
-        }
-
-        .spreadsheet-container {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin-top: 30px;
-        }
-
-        .spreadsheet-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .spreadsheet-header h3 {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th {
-            background: #f8f9fa;
-            padding: 15px 10px;
-            text-align: center;
-            font-weight: 600;
-            color: #333;
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        td {
-            padding: 12px 10px;
-            text-align: center;
-            border-bottom: 1px solid #e9ecef;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        td:hover {
-            background: #f0f8ff;
-        }
-
-        .editable {
-            background: #fff3cd;
-        }
-
-        .editable:hover {
-            background: #ffeaa7;
-        }
-
-        .edit-input {
-            width: 100%;
-            padding: 5px;
-            border: 2px solid #4facfe;
-            border-radius: 4px;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-
-        .status-message {
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .floating-buttons {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        .fab {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .fab:hover {
-            transform: scale(1.1);
-        }
-
-        @media (max-width: 768px) {
-            .form-section {
-                grid-template-columns: 1fr;
-            }
-            
-            .data-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-
-            .data-grid-horizontal {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .main-content {
-                padding: 20px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts link is now in style.css via @import -->
 </head>
 <body>
     <div class="container">
@@ -400,6 +77,7 @@
 
     <!-- Botões Flutuantes -->
     <div class="floating-buttons">
+        <button class="fab btn-theme-toggle" onclick="toggleTheme()" title="Alternar Tema" id="themeToggleBtn">☀️</button>
         <button class="fab btn-success" onclick="exportarExcel()" title="Exportar Excel">📥</button>
         <button class="fab btn-primary" onclick="limparDados()" title="Limpar Dados">🗑️</button>
     </div>
@@ -407,14 +85,44 @@
     <script>
         let dados = [];
         let editingCell = null;
+        let currentModal = null; // Keep track of the current modal
+
+        // --- THEME TOGGLE ---
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggleBtn.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeToggleBtn.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme.matches ? 'dark' : 'light');
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        }
+        
+        // Load saved theme or system preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            applyTheme(prefersDarkScheme.matches ? 'dark' : 'light');
+        }
+        // --- END THEME TOGGLE ---
+
 
         function formatarPeso(pesoStr) {
             if (!pesoStr) return null;
             
-            // Remove espaços e normaliza
             pesoStr = pesoStr.trim();
             
-            // Se já tem vírgula ou ponto, trata como decimal
             if (pesoStr.includes(',') || pesoStr.includes('.')) {
                 try {
                     const peso = parseFloat(pesoStr.replace(',', '.'));
@@ -424,16 +132,11 @@
                 }
             }
             
-            // Se é só números, precisa decidir se é gramas ou centigramas
             if (pesoStr.match(/^\d+$/)) {
                 const numero = parseInt(pesoStr);
-                
-                // Se o número é maior que 999, provavelmente são centigramas (ex: 3295 = 32,95g)
                 if (numero > 999) {
                     return numero / 100.0;
-                }
-                // Se é menor que 1000, provavelmente já são gramas (ex: 32 = 32g)
-                else {
+                } else {
                     return numero;
                 }
             }
@@ -476,13 +179,26 @@
             }
 
             const codigoCompleto = codigoBase + numeroClone;
-
-            // Criar modal para entrada de dados
             criarModalEntradaDados(codigoCompleto);
+        }
+        
+        // Handler for ESC key on modal
+        function handleModalEsc(event) {
+            if (event.key === 'Escape') {
+                if (currentModal) {
+                    currentModal.remove();
+                    currentModal = null;
+                    document.removeEventListener('keydown', handleModalEsc);
+                }
+            }
         }
 
         function criarModalEntradaDados(codigoCompleto) {
+            if (currentModal) currentModal.remove(); // Remove any existing modal
+
             const modal = document.createElement('div');
+            currentModal = modal; // Set current modal
+
             modal.style.cssText = `
                 position: fixed; top: 0; left: 0; width: 100%; height: 100%;
                 background: rgba(0,0,0,0.8); display: flex; align-items: center;
@@ -490,24 +206,15 @@
                 box-sizing: border-box; overflow-y: auto;
             `;
 
+            // Use class for modal content styling from CSS
             modal.innerHTML = `
-                <div style="
-                    background: white; 
-                    padding: 25px; 
-                    border-radius: 20px; 
-                    max-width: 550px; 
-                    width: 100%; 
-                    max-height: 90vh;
-                    overflow-y: auto;
-                    margin: auto;
-                    box-sizing: border-box;
-                ">
-                    <h3 style="text-align: center; margin-bottom: 25px; color: #333; font-size: 1.3rem;">
+                <div class="modal-content"> 
+                    <h3>
                         📝 Dados para Clone: ${codigoCompleto}
                     </h3>
                     
                     <div style="margin-bottom: 25px;">
-                        <h4 style="color: #555; margin-bottom: 15px; font-size: 1.1rem;">⚖️ Pesos (g):</h4>
+                        <h4>⚖️ Pesos (g):</h4>
                         <div class="data-grid">
                             <input type="text" id="peso1" placeholder="Rep 1" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
                             <input type="text" id="peso2" placeholder="Rep 2" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
@@ -517,7 +224,7 @@
                     </div>
 
                     <div style="margin-bottom: 25px;">
-                        <h4 style="color: #555; margin-bottom: 15px; font-size: 1.1rem;">🦠 Nematoides Totais:</h4>
+                        <h4>🦠 Nematoides Totais:</h4>
                         <div class="data-grid">
                             <input type="text" id="nema1" placeholder="Rep 1" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
                             <input type="text" id="nema2" placeholder="Rep 2" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
@@ -527,10 +234,10 @@
                     </div>
 
                     <div style="text-align: center; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn btn-success" onclick="salvarDadosClone('${codigoCompleto}', this.parentElement.parentElement.parentElement)" style="padding: 12px 20px; font-size: 0.95rem;">
+                        <button class="btn btn-success" onclick="salvarDadosClone('${codigoCompleto}')" style="padding: 12px 20px; font-size: 0.95rem;">
                             ✅ Salvar
                         </button>
-                        <button class="btn" style="background: #6c757d; color: white; padding: 12px 20px; font-size: 0.95rem;" onclick="this.parentElement.parentElement.parentElement.remove()">
+                        <button class="btn" style="background: #6c757d; color: white; padding: 12px 20px; font-size: 0.95rem;" onclick="this.closest('.modal-content').parentElement.remove(); currentModal = null; document.removeEventListener('keydown', handleModalEsc);">
                             ❌ Cancelar
                         </button>
                     </div>
@@ -538,41 +245,43 @@
             `;
 
             document.body.appendChild(modal);
+            document.addEventListener('keydown', handleModalEsc); // Add ESC listener
 
-            // Adicionar evento de Enter para todos os inputs do modal
             const modalInputs = modal.querySelectorAll('input');
             modalInputs.forEach(input => {
                 input.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
-                        salvarDadosClone(codigoCompleto, modal);
+                        salvarDadosClone(codigoCompleto);
                     }
                 });
             });
 
-            // Fechar modal clicando fora
             modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
+                if (e.target === modal) { // Clicked on the backdrop
                     modal.remove();
+                    currentModal = null;
+                    document.removeEventListener('keydown', handleModalEsc);
                 }
             });
         }
 
-        function salvarDadosClone(codigoCompleto, modal) {
+        function salvarDadosClone(codigoCompleto) {
+            if (!currentModal) return; // Ensure modal exists
+
             const pesos = [
-                document.getElementById('peso1').value,
-                document.getElementById('peso2').value,
-                document.getElementById('peso3').value,
-                document.getElementById('peso4').value
+                currentModal.querySelector('#peso1').value,
+                currentModal.querySelector('#peso2').value,
+                currentModal.querySelector('#peso3').value,
+                currentModal.querySelector('#peso4').value
             ];
 
             const nematoides = [
-                document.getElementById('nema1').value,
-                document.getElementById('nema2').value,
-                document.getElementById('nema3').value,
-                document.getElementById('nema4').value
+                currentModal.querySelector('#nema1').value,
+                currentModal.querySelector('#nema2').value,
+                currentModal.querySelector('#nema3').value,
+                currentModal.querySelector('#nema4').value
             ];
 
-            // Adicionar dados à tabela
             for (let i = 0; i < 4; i++) {
                 const peso = formatarPeso(pesos[i]);
                 const nema = nematoides[i] && nematoides[i].match(/^\d+$/) ? parseInt(nematoides[i]) : null;
@@ -588,7 +297,9 @@
             }
 
             atualizarTabela();
-            modal.remove();
+            currentModal.remove();
+            currentModal = null;
+            document.removeEventListener('keydown', handleModalEsc); // Clean up listener
             document.getElementById('numeroClone').value = '';
             mostrarMensagem(`Clone ${codigoCompleto} adicionado com sucesso!`, 'success');
         }
@@ -629,6 +340,7 @@
             input.select();
 
             function finalizarEdicao() {
+                if (!editingCell) return; // Avoid issues if already finalized
                 let novoValor = input.value.trim();
                 
                 if (campo === 'peso') {
@@ -640,14 +352,23 @@
                 dados[index][campo] = novoValor;
                 cell.innerHTML = novoValor !== null ? novoValor : '';
                 editingCell = null;
+                input.removeEventListener('blur', finalizarEdicao); // Clean up
+                input.removeEventListener('keypress', handleEditKeyPress); // Clean up
+            }
+
+            function handleEditKeyPress(e) {
+                if (e.key === 'Enter') {
+                    finalizarEdicao();
+                } else if (e.key === 'Escape') { // Allow Esc to cancel edit
+                    cell.innerHTML = valorAtual !== null ? valorAtual : '';
+                    editingCell = null;
+                    input.removeEventListener('blur', finalizarEdicao);
+                    input.removeEventListener('keypress', handleEditKeyPress);
+                }
             }
 
             input.addEventListener('blur', finalizarEdicao);
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    finalizarEdicao();
-                }
-            });
+            input.addEventListener('keypress', handleEditKeyPress);
         }
 
         function exportarExcel() {
@@ -658,7 +379,6 @@
 
             const nomeArquivo = document.getElementById('nomeArquivo').value.trim() || 'dados_clones';
             
-            // Preparar dados para exportação
             const dadosExportacao = [
                 ['Clones', 'Rep', 'Peso g (casca+raiz)', 'Nematoides totais', 'Nema/g', 'FR']
             ];
@@ -674,29 +394,32 @@
                 ]);
             });
 
-            // Criar workbook e worksheet
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(dadosExportacao);
 
-            // Estilizar cabeçalho
             const range = XLSX.utils.decode_range(ws['!ref']);
             for (let C = range.s.c; C <= range.e.c; ++C) {
                 const address = XLSX.utils.encode_cell({ r: 0, c: C });
                 if (!ws[address]) continue;
                 ws[address].s = {
-                    font: { bold: true },
+                    font: { bold: true, color: { rgb: "FFFFFFFF" } }, // White text
+                    fill: { fgColor: { rgb: "FF4facfe" } }, // Blue background
                     alignment: { horizontal: 'center' }
                 };
             }
+            // Style for dark theme compatibility
+            if (document.documentElement.getAttribute('data-theme') === 'dark') {
+                 for (let C = range.s.c; C <= range.e.c; ++C) {
+                    const address = XLSX.utils.encode_cell({ r: 0, c: C });
+                    if (!ws[address]) continue;
+                    ws[address].s.fill.fgColor.rgb = "FF9055A2"; // Purpureus
+                    ws[address].s.font.color.rgb = "FF011638"; // Oxford Blue text
+                 }
+            }
 
-            // Ajustar largura das colunas
+
             const colWidths = [
-                { wch: 15 }, // Clones
-                { wch: 8 },  // Rep
-                { wch: 20 }, // Peso
-                { wch: 18 }, // Nematoides
-                { wch: 12 }, // Nema/g
-                { wch: 8 }   // FR
+                { wch: 15 }, { wch: 8 }, { wch: 20 }, { wch: 18 }, { wch: 12 }, { wch: 8 }
             ];
             ws['!cols'] = colWidths;
 
@@ -719,11 +442,12 @@
             container.innerHTML = `<div class="status-message ${tipo}">${texto}</div>`;
             
             setTimeout(() => {
-                container.innerHTML = '';
+                if (container.firstChild && container.firstChild.textContent === texto) { // Only clear if it's the same message
+                    container.innerHTML = '';
+                }
             }, 4000);
         }
 
-        // Validação em tempo real
         document.getElementById('ano').addEventListener('input', function() {
             this.value = this.value.replace(/\D/g, '');
         });
@@ -732,14 +456,12 @@
             this.value = this.value.replace(/\D/g, '');
         });
 
-        // Adicionar evento Enter ao campo número do clone
         document.getElementById('numeroClone').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 adicionarClone();
             }
         });
 
-        // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             mostrarMensagem('🚀 Sistema iniciado! Preencha as configurações e comece a adicionar clones.', 'success');
         });
