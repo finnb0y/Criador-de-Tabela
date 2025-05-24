@@ -1,0 +1,505 @@
+/* style.css */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Krona+One&family=Montserrat:wght@400;600;700&display=swap');
+
+:root {
+    /* Light Theme (adapted from original) */
+    --font-body: 'Montserrat', sans-serif;
+    --font-heading-main: 'Krona One', sans-serif;
+    --font-heading-sub: 'Bebas Neue', cursive;
+
+    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --container-bg: rgba(255, 255, 255, 0.95);
+    --container-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    --header-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --header-text: white;
+    --header-text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    --form-group-bg: #f8f9fa;
+    --form-group-border-hover: #4facfe;
+    --form-group-text: #333;
+    --label-text: #555;
+    --input-border: #e0e0e0;
+    --input-border-focus: #4facfe;
+    --input-focus-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+    --input-bg: white;
+    --input-text: #333;
+    --clone-section-bg: #f0f8ff;
+    --clone-section-border: #4facfe;
+    --btn-primary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --btn-primary-text: white;
+    --btn-primary-shadow-hover: 0 5px 15px rgba(79, 172, 254, 0.4);
+    --btn-success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+    --btn-success-text: white;
+    --btn-success-shadow-hover: 0 5px 15px rgba(86, 171, 47, 0.4);
+    --btn-export-gradient: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%);
+    --btn-export-text: white;
+    --btn-export-shadow-hover: 0 5px 15px rgba(255, 107, 107, 0.4);
+    --spreadsheet-container-bg: white;
+    --spreadsheet-header-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --spreadsheet-header-text: white;
+    --table-th-bg: #f8f9fa;
+    --table-th-text: #333;
+    --table-border-bottom: #dee2e6;
+    --table-td-border-bottom: #e9ecef;
+    --table-td-hover-bg: #f0f8ff;
+    --editable-bg: #fff3cd;
+    --editable-hover-bg: #ffeaa7;
+    --edit-input-border: #4facfe;
+    --status-success-bg: #d4edda;
+    --status-success-text: #155724;
+    --status-success-border: #c3e6cb;
+    --status-error-bg: #f8d7da;
+    --status-error-text: #721c24;
+    --status-error-border: #f5c6cb;
+    --fab-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    --modal-bg: white;
+    --modal-text: #333;
+    --modal-input-bg: white;
+    --modal-input-text: #333;
+    --modal-input-border: #ddd;
+
+    /* Dark Theme Palette Variables */
+    --oxford-blue: #011638ff;
+    --space-cadet: #2e294eff;
+    --purpureus: #9055a2ff;
+    --lilac: #d499b9ff;
+    --tea-rose-red: rgba(255, 255, 255, 0.842);
+}
+
+[data-theme="dark"] {
+    --bg-gradient: linear-gradient(135deg, var(--oxford-blue) 0%, var(--space-cadet) 100%);
+    --container-bg: rgba(46, 41, 78, 0.95); /* space-cadet with alpha */
+    --container-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    --header-gradient: linear-gradient(135deg, var(--purpureus) 0%, var(--lilac) 100%);
+    --header-text: var(--oxford-blue);
+    --header-text-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+    --form-group-bg: var(--oxford-blue);
+    --form-group-border-hover: var(--lilac);
+    --form-group-text: var(--tea-rose-red);
+    --label-text: var(--lilac);
+    --input-border: var(--purpureus);
+    --input-border-focus: var(--lilac);
+    --input-focus-shadow: 0 0 0 3px rgba(212, 153, 185, 0.2);
+    --input-bg: var(--space-cadet);
+    --input-text: var(--tea-rose-red);
+    --clone-section-bg: var(--oxford-blue);
+    --clone-section-border: var(--purpureus);
+    --btn-primary-gradient: linear-gradient(135deg, var(--purpureus) 0%, var(--lilac) 100%);
+    --btn-primary-text: var(--oxford-blue);
+    --btn-primary-shadow-hover: 0 5px 15px rgba(144, 85, 162, 0.4);
+    --btn-success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%); /* Keep success colors for contrast */
+    --btn-success-text: white;
+    --btn-success-shadow-hover: 0 5px 15px rgba(86, 171, 47, 0.4);
+    --btn-export-gradient: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%); /* Keep export colors for contrast */
+    --btn-export-text: white;
+    --btn-export-shadow-hover: 0 5px 15px rgba(255, 107, 107, 0.4);
+    --spreadsheet-container-bg: var(--space-cadet);
+    --spreadsheet-header-gradient: linear-gradient(135deg, var(--oxford-blue) 0%, var(--space-cadet) 100%);
+    --spreadsheet-header-text: var(--tea-rose-red);
+    --table-th-bg: var(--oxford-blue);
+    --table-th-text: var(--lilac);
+    --table-border-bottom: var(--purpureus);
+    --table-td-border-bottom: var(--purpureus);
+    --table-td-hover-bg: var(--oxford-blue);
+    --editable-bg: var(--space-cadet); /* Adjust if needed for better visibility */
+    --editable-hover-bg: var(--oxford-blue);
+    --edit-input-border: var(--lilac);
+    --status-success-bg: #103d1c; /* Darker success */
+    --status-success-text: #a8e6cf;
+    --status-success-border: #56ab2f;
+    --status-error-bg: #5a1218; /* Darker error */
+    --status-error-text: #ffa8a8;
+    --status-error-border: #ff6b6b;
+    --fab-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    --modal-bg: var(--space-cadet);
+    --modal-text: var(--tea-rose-red);
+    --modal-input-bg: var(--oxford-blue);
+    --modal-input-text: var(--tea-rose-red);
+    --modal-input-border: var(--purpureus);
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    padding: 20px;
+    color: var(--form-group-text); /* Default text color for body */
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--container-bg);
+    border-radius: 20px;
+    box-shadow: var(--container-shadow);
+    overflow: hidden;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.header {
+    background: var(--header-gradient);
+    color: var(--header-text);
+    padding: 30px;
+    text-align: center;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.header h1 {
+    font-family: var(--font-heading-main);
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: var(--header-text-shadow);
+}
+
+.header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.main-content {
+    padding: 30px;
+}
+
+.form-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    background: var(--form-group-bg);
+    padding: 25px;
+    border-radius: 15px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.form-group:hover {
+    border-color: var(--form-group-border-hover);
+    transform: translateY(-2px);
+}
+
+.form-group h3 {
+    font-family: var(--font-heading-sub);
+    color: var(--form-group-text);
+    margin-bottom: 20px;
+    font-size: 1.6rem; /* Bebas Neue is taller */
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-group h3::before {
+    content: "📋";
+    font-size: 1.5rem;
+}
+
+.input-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+label {
+    font-weight: 600;
+    color: var(--label-text);
+    min-width: 120px;
+}
+
+input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid var(--input-border);
+    border-radius: 10px;
+    font-size: 1rem;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--input-border-focus);
+    box-shadow: var(--input-focus-shadow);
+}
+
+.clone-section {
+    background: var(--clone-section-bg);
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border-left: 5px solid var(--clone-section-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.clone-section h4 {
+    font-family: var(--font-heading-sub);
+    color: var(--form-group-text); /* Use same as form-group for consistency */
+    margin-bottom: 20px;
+    font-size: 1.4rem; /* Bebas Neue */
+    letter-spacing: 0.5px;
+}
+
+.data-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.data-grid-horizontal {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 640px) {
+    .data-grid-horizontal {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+}
+
+.data-input {
+    padding: 10px;
+    border: 2px solid var(--modal-input-border); /* Changed from #ddd */
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9rem;
+    background-color: var(--modal-input-bg);
+    color: var(--modal-input-text);
+}
+
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: var(--font-heading-sub); /* Bebas Neue for buttons */
+}
+
+.btn-primary {
+    background: var(--btn-primary-gradient);
+    color: var(--btn-primary-text);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--btn-primary-shadow-hover);
+}
+
+.btn-success {
+    background: var(--btn-success-gradient);
+    color: var(--btn-success-text);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--btn-success-shadow-hover);
+}
+
+.btn-export {
+    background: var(--btn-export-gradient);
+    color: var(--btn-export-text);
+    margin-left: 10px;
+}
+
+.btn-export:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--btn-export-shadow-hover);
+}
+
+.spreadsheet-container {
+    background: var(--spreadsheet-container-bg);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    transition: background-color 0.3s ease;
+}
+
+.spreadsheet-header {
+    background: var(--spreadsheet-header-gradient);
+    color: var(--spreadsheet-header-text);
+    padding: 20px;
+    text-align: center;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.spreadsheet-header h3 {
+    font-family: var(--font-heading-sub);
+    font-size: 1.8rem; /* Bebas Neue */
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+th {
+    background: var(--table-th-bg);
+    padding: 15px 10px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--table-th-text);
+    border-bottom: 2px solid var(--table-border-bottom);
+    font-family: var(--font-heading-sub); /* Bebas Neue for table headers */
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid var(--table-td-border-bottom);
+    color: var(--form-group-text); /* Use general text color */
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+td:hover {
+    background: var(--table-td-hover-bg);
+}
+
+.editable {
+    background: var(--editable-bg);
+    font-weight: bold;
+}
+
+.editable:hover {
+    background: var(--editable-hover-bg);
+}
+
+.edit-input {
+    width: 100%;
+    padding: 5px;
+    border: 2px solid var(--edit-input-border);
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.9rem;
+    background-color: var(--input-bg); /* Same as general inputs */
+    color: var(--input-text);
+}
+
+.status-message {
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: center;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.success {
+    background: var(--status-success-bg);
+    color: var(--status-success-text);
+    border: 1px solid var(--status-success-border);
+}
+
+.error {
+    background: var(--status-error-bg);
+    color: var(--status-error-text);
+    border: 1px solid var(--status-error-border);
+}
+
+.floating-buttons {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.fab {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--fab-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fab:hover {
+    transform: scale(1.1);
+}
+
+/* Theme toggle button specific style */
+.btn-theme-toggle {
+    background: var(--btn-primary-gradient);
+    color: var(--btn-primary-text);
+}
+.btn-theme-toggle:hover {
+    box-shadow: var(--btn-primary-shadow-hover);
+}
+
+
+/* Modal specific styles using CSS variables */
+.modal-content {
+    background: var(--modal-bg) !important; /* Override inline style */
+    padding: 25px; 
+    border-radius: 20px; 
+    max-width: 550px; 
+    width: 100%; 
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: auto;
+    box-sizing: border-box;
+    transition: background-color 0.3s ease;
+}
+
+.modal-content h3, .modal-content h4 {
+    color: var(--modal-text) !important; /* Override inline style */
+    font-family: var(--font-heading-sub);
+}
+.modal-content h3 { font-size: 1.5rem; letter-spacing: 0.5px;}
+.modal-content h4 { font-size: 1.3rem; letter-spacing: 0.5px;}
+
+
+@media (max-width: 768px) {
+    .form-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .data-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .data-grid-horizontal {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .main-content {
+        padding: 20px;
+    }
+}
