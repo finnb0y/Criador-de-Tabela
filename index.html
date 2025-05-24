@@ -128,9 +128,23 @@
 
         .data-grid {
             display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .data-grid-horizontal {
+            display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             margin-bottom: 15px;
+        }
+
+        @media (max-width: 640px) {
+            .data-grid-horizontal {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
         }
 
         .data-input {
@@ -299,6 +313,11 @@
             }
             
             .data-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .data-grid-horizontal {
                 grid-template-columns: repeat(2, 1fr);
             }
             
@@ -467,40 +486,51 @@
             modal.style.cssText = `
                 position: fixed; top: 0; left: 0; width: 100%; height: 100%;
                 background: rgba(0,0,0,0.8); display: flex; align-items: center;
-                justify-content: center; z-index: 2000;
+                justify-content: center; z-index: 2000; padding: 20px;
+                box-sizing: border-box; overflow-y: auto;
             `;
 
             modal.innerHTML = `
-                <div style="background: white; padding: 30px; border-radius: 20px; max-width: 600px; width: 90%;">
-                    <h3 style="text-align: center; margin-bottom: 25px; color: #333;">
+                <div style="
+                    background: white; 
+                    padding: 25px; 
+                    border-radius: 20px; 
+                    max-width: 550px; 
+                    width: 100%; 
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    margin: auto;
+                    box-sizing: border-box;
+                ">
+                    <h3 style="text-align: center; margin-bottom: 25px; color: #333; font-size: 1.3rem;">
                         📝 Dados para Clone: ${codigoCompleto}
                     </h3>
                     
                     <div style="margin-bottom: 25px;">
-                        <h4 style="color: #555; margin-bottom: 15px;">⚖️ Pesos (g):</h4>
+                        <h4 style="color: #555; margin-bottom: 15px; font-size: 1.1rem;">⚖️ Pesos (g):</h4>
                         <div class="data-grid">
-                            <input type="text" id="peso1" placeholder="Rep 1" class="data-input">
-                            <input type="text" id="peso2" placeholder="Rep 2" class="data-input">
-                            <input type="text" id="peso3" placeholder="Rep 3" class="data-input">
-                            <input type="text" id="peso4" placeholder="Rep 4" class="data-input">
+                            <input type="text" id="peso1" placeholder="Rep 1" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
+                            <input type="text" id="peso2" placeholder="Rep 2" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
+                            <input type="text" id="peso3" placeholder="Rep 3" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
+                            <input type="text" id="peso4" placeholder="Rep 4" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
                         </div>
                     </div>
 
                     <div style="margin-bottom: 25px;">
-                        <h4 style="color: #555; margin-bottom: 15px;">🦠 Nematoides Totais:</h4>
+                        <h4 style="color: #555; margin-bottom: 15px; font-size: 1.1rem;">🦠 Nematoides Totais:</h4>
                         <div class="data-grid">
-                            <input type="text" id="nema1" placeholder="Rep 1" class="data-input">
-                            <input type="text" id="nema2" placeholder="Rep 2" class="data-input">
-                            <input type="text" id="nema3" placeholder="Rep 3" class="data-input">
-                            <input type="text" id="nema4" placeholder="Rep 4" class="data-input">
+                            <input type="text" id="nema1" placeholder="Rep 1" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
+                            <input type="text" id="nema2" placeholder="Rep 2" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
+                            <input type="text" id="nema3" placeholder="Rep 3" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
+                            <input type="text" id="nema4" placeholder="Rep 4" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
                         </div>
                     </div>
 
-                    <div style="text-align: center; display: flex; gap: 15px; justify-content: center;">
-                        <button class="btn btn-success" onclick="salvarDadosClone('${codigoCompleto}', this.parentElement.parentElement.parentElement)">
+                    <div style="text-align: center; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-success" onclick="salvarDadosClone('${codigoCompleto}', this.parentElement.parentElement.parentElement)" style="padding: 12px 20px; font-size: 0.95rem;">
                             ✅ Salvar
                         </button>
-                        <button class="btn" style="background: #6c757d; color: white;" onclick="this.parentElement.parentElement.parentElement.remove()">
+                        <button class="btn" style="background: #6c757d; color: white; padding: 12px 20px; font-size: 0.95rem;" onclick="this.parentElement.parentElement.parentElement.remove()">
                             ❌ Cancelar
                         </button>
                     </div>
@@ -508,6 +538,23 @@
             `;
 
             document.body.appendChild(modal);
+
+            // Adicionar evento de Enter para todos os inputs do modal
+            const modalInputs = modal.querySelectorAll('input');
+            modalInputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        salvarDadosClone(codigoCompleto, modal);
+                    }
+                });
+            });
+
+            // Fechar modal clicando fora
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
         }
 
         function salvarDadosClone(codigoCompleto, modal) {
@@ -683,6 +730,13 @@
 
         document.getElementById('pais').addEventListener('input', function() {
             this.value = this.value.replace(/\D/g, '');
+        });
+
+        // Adicionar evento Enter ao campo número do clone
+        document.getElementById('numeroClone').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                adicionarClone();
+            }
         });
 
         // Inicialização
