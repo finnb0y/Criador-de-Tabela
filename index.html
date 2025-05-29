@@ -9,7 +9,7 @@
     <!-- Google Fonts link is now in style.css via @import -->
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="mainAppView">
         <div class="header">
             <h1>🧬 Sistema de Coleta de Dados de Clones</h1>
             <p>Interface intuitiva para coleta e exportação de dados experimentais</p>
@@ -75,396 +75,85 @@
         </div>
     </div>
 
+    <!-- NOVA SEÇÃO: Multiplicador (inicialmente oculta) -->
+    <div class="container" id="multiplicadorView" style="display: none;">
+        <div class="header">
+            <h1>⚙️ Multiplicador de Dados de Planilha</h1>
+            <p>Carregue uma planilha, selecione uma coluna, defina o intervalo de linhas e multiplique seus dados.</p>
+            <button class="btn btn-primary" onclick="toggleViews()" style="margin-top: 15px;">Voltar para Coleta de Dados</button>
+        </div>
+        <div class="main-content">
+            <div class="form-section">
+                <div class="form-group">
+                    <h3>1. Carregar Planilha</h3>
+                    <div id="dropZone" class="drop-zone">
+                        Arraste e solte o arquivo Excel aqui (.xlsx, .xls, .csv)
+                        <br>ou<br>
+                        <input type="file" id="fileInputMulti" accept=".xlsx, .xls, .csv" style="margin-top: 10px;">
+                    </div>
+                </div>
+
+                <div class="form-group" id="colSelectionGroup" style="display: none;">
+                    <h3>2. Selecionar Dados</h3>
+                    <div class="input-row">
+                        <label for="sheetSelector">Planilha (Aba):</label>
+                        <select id="sheetSelector" class="data-input" onchange="handleSheetSelection()"></select>
+                    </div>
+                    <div class="input-row">
+                        <label for="columnSelector">Coluna para Multiplicar:</label>
+                        <select id="columnSelector" class="data-input"></select>
+                    </div>
+                    <!-- NOVOS CAMPOS PARA INTERVALO DE LINHAS -->
+                    <div class="input-row">
+                        <label for="startRowSelector">Linha Inicial (dados):</label>
+                        <input type="number" id="startRowSelector" class="data-input" placeholder="Ex: 1" min="1">
+                    </div>
+                    <div class="input-row">
+                        <label for="endRowSelector">Linha Final (dados):</label>
+                        <input type="number" id="endRowSelector" class="data-input" placeholder="Ex: 100" min="1">
+                    </div>
+                    <!-- FIM DOS NOVOS CAMPOS -->
+                    <button class="btn btn-primary" onclick="processarMultiplicacao()" style="margin-top:15px;">Multiplicar Dados</button>
+                </div>
+            </div>
+
+            <div id="originalPreviewContainer" class="spreadsheet-container" style="display: none; margin-bottom: 20px;">
+                <div class="spreadsheet-header">
+                    <h3>📄 Pré-visualização da Planilha Original</h3>
+                </div>
+                <div class="table-responsive-wrapper">
+                    <table id="originalDataTable">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="multipliedPreviewContainer" class="spreadsheet-container" style="display: none;">
+                <div class="spreadsheet-header">
+                    <h3>✨ Dados Multiplicados</h3>
+                     <button class="btn btn-success" onclick="exportarDadosMultiplicados()" style="margin-top:10px;">📥 Exportar Dados Multiplicados</button>
+                </div>
+                <div class="table-responsive-wrapper">
+                    <table id="multipliedDataTable">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="multiplicadorStatusMessage"></div>
+        </div>
+    </div>
+
+
     <!-- Botões Flutuantes -->
     <div class="floating-buttons">
         <button class="fab btn-theme-toggle" onclick="toggleTheme()" title="Alternar Tema" id="themeToggleBtn">☀️</button>
         <button class="fab btn-success" onclick="exportarExcel()" title="Exportar Excel">📥</button>
         <button class="fab btn-primary" onclick="limparDados()" title="Limpar Dados">🗑️</button>
+        <button class="fab" style="background-color: #FFC107; color: white;" onclick="toggleViews()" title="Multiplicador de Dados">⚙️</button>
     </div>
 
-    <script>
-        let dados = [];
-        let editingCell = null;
-        let currentModal = null; // Keep track of the current modal
-
-        // --- THEME TOGGLE ---
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
-
-        function applyTheme(theme) {
-            if (theme === "dark") {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                themeToggleBtn.textContent = '🌙';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-                themeToggleBtn.textContent = '☀️';
-                localStorage.setItem('theme', 'light');
-            }
-        }
-
-        function toggleTheme() {
-            const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme.matches ? 'dark' : 'light');
-            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
-        }
-        
-        // Load saved theme or system preference
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            applyTheme(savedTheme);
-        } else {
-            applyTheme(prefersDarkScheme.matches ? 'dark' : 'light');
-        }
-        // --- END THEME TOGGLE ---
-
-
-        function formatarPeso(pesoStr) {
-            if (!pesoStr) return null;
-            
-            pesoStr = pesoStr.trim();
-            
-            if (pesoStr.includes(',') || pesoStr.includes('.')) {
-                try {
-                    const peso = parseFloat(pesoStr.replace(',', '.'));
-                    return isNaN(peso) ? null : peso;
-                } catch {
-                    return null;
-                }
-            }
-            
-            if (pesoStr.match(/^\d+$/)) {
-                const numero = parseInt(pesoStr);
-                if (numero > 999) {
-                    return numero / 100.0;
-                } else {
-                    return numero;
-                }
-            }
-            
-            return null;
-        }
-
-        function gerarCodigoCompleto() {
-            const ano = document.getElementById('ano').value.trim();
-            const pais = document.getElementById('pais').value.trim();
-            
-            if (!ano || !pais) {
-                mostrarMensagem('Por favor, preencha o ano e código dos pais primeiro.', 'error');
-                return null;
-            }
-
-            const anoFinal = ano.length === 4 ? ano.slice(-2) : ano;
-            
-            if (anoFinal.length !== 2 || !anoFinal.match(/^\d{2}$/)) {
-                mostrarMensagem('Formato de ano inválido.', 'error');
-                return null;
-            }
-
-            if (pais.length !== 2 || !pais.match(/^\d{2}$/)) {
-                mostrarMensagem('Formato de código dos pais inválido.', 'error');
-                return null;
-            }
-
-            return anoFinal + pais;
-        }
-
-        function adicionarClone() {
-            const codigoBase = gerarCodigoCompleto();
-            if (!codigoBase) return;
-
-            const numeroClone = document.getElementById('numeroClone').value.trim();
-            if (!numeroClone) {
-                mostrarMensagem('Por favor, digite o número do clone.', 'error');
-                return;
-            }
-
-            const codigoCompleto = codigoBase + numeroClone;
-            criarModalEntradaDados(codigoCompleto);
-        }
-        
-        // Handler for ESC key on modal
-        function handleModalEsc(event) {
-            if (event.key === 'Escape') {
-                if (currentModal) {
-                    currentModal.remove();
-                    currentModal = null;
-                    document.removeEventListener('keydown', handleModalEsc);
-                }
-            }
-        }
-
-        function criarModalEntradaDados(codigoCompleto) {
-            if (currentModal) currentModal.remove(); // Remove any existing modal
-
-            const modal = document.createElement('div');
-            currentModal = modal; // Set current modal
-
-            modal.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: rgba(0,0,0,0.8); display: flex; align-items: center;
-                justify-content: center; z-index: 2000; padding: 20px;
-                box-sizing: border-box; overflow-y: auto;
-            `;
-
-            // Use class for modal content styling from CSS
-            modal.innerHTML = `
-                <div class="modal-content"> 
-                    <h3>
-                        📝 Dados para Clone: ${codigoCompleto}
-                    </h3>
-                    
-                    <div style="margin-bottom: 25px;">
-                        <h4>⚖️ Pesos (g):</h4>
-                        <div class="data-grid">
-                            <input type="text" id="peso1" placeholder="Rep 1" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
-                            <input type="text" id="peso2" placeholder="Rep 2" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
-                            <input type="text" id="peso3" placeholder="Rep 3" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
-                            <input type="text" id="peso4" placeholder="Rep 4" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 25px;">
-                        <h4>🦠 Nematoides Totais:</h4>
-                        <div class="data-grid">
-                            <input type="text" id="nema1" placeholder="Rep 1" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
-                            <input type="text" id="nema2" placeholder="Rep 2" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
-                            <input type="text" id="nema3" placeholder="Rep 3" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
-                            <input type="text" id="nema4" placeholder="Rep 4" class="data-input" style="padding: 12px 8px; font-size: 0.9rem;">
-                        </div>
-                    </div>
-
-                    <div style="text-align: center; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn btn-success" onclick="salvarDadosClone('${codigoCompleto}')" style="padding: 12px 20px; font-size: 0.95rem;">
-                            ✅ Salvar
-                        </button>
-                        <button class="btn" style="background: #6c757d; color: white; padding: 12px 20px; font-size: 0.95rem;" onclick="this.closest('.modal-content').parentElement.remove(); currentModal = null; document.removeEventListener('keydown', handleModalEsc);">
-                            ❌ Cancelar
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(modal);
-            document.addEventListener('keydown', handleModalEsc); // Add ESC listener
-
-            const modalInputs = modal.querySelectorAll('input');
-            modalInputs.forEach(input => {
-                input.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        salvarDadosClone(codigoCompleto);
-                    }
-                });
-            });
-
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) { // Clicked on the backdrop
-                    modal.remove();
-                    currentModal = null;
-                    document.removeEventListener('keydown', handleModalEsc);
-                }
-            });
-        }
-
-        function salvarDadosClone(codigoCompleto) {
-            if (!currentModal) return; // Ensure modal exists
-
-            const pesos = [
-                currentModal.querySelector('#peso1').value,
-                currentModal.querySelector('#peso2').value,
-                currentModal.querySelector('#peso3').value,
-                currentModal.querySelector('#peso4').value
-            ];
-
-            const nematoides = [
-                currentModal.querySelector('#nema1').value,
-                currentModal.querySelector('#nema2').value,
-                currentModal.querySelector('#nema3').value,
-                currentModal.querySelector('#nema4').value
-            ];
-
-            for (let i = 0; i < 4; i++) {
-                const peso = formatarPeso(pesos[i]);
-                const nema = nematoides[i] && nematoides[i].match(/^\d+$/) ? parseInt(nematoides[i]) : null;
-                
-                dados.push({
-                    clone: codigoCompleto,
-                    rep: i + 1,
-                    peso: peso,
-                    nematoides: nema,
-                    nemaG: null,
-                    fr: null
-                });
-            }
-
-            atualizarTabela();
-            currentModal.remove();
-            currentModal = null;
-            document.removeEventListener('keydown', handleModalEsc); // Clean up listener
-            document.getElementById('numeroClone').value = '';
-            mostrarMensagem(`Clone ${codigoCompleto} adicionado com sucesso!`, 'success');
-        }
-
-        function atualizarTabela() {
-            const tbody = document.getElementById('dataTableBody');
-            tbody.innerHTML = '';
-
-            dados.forEach((item, index) => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${item.clone}</td>
-                    <td>${item.rep}</td>
-                    <td class="editable" onclick="editarCelula(this, ${index}, 'peso')">${item.peso !== null ? item.peso : ''}</td>
-                    <td class="editable" onclick="editarCelula(this, ${index}, 'nematoides')">${item.nematoides !== null ? item.nematoides : ''}</td>
-                    <td>${item.nemaG !== null ? item.nemaG : ''}</td>
-                    <td>${item.fr !== null ? item.fr : ''}</td>
-                `;
-            });
-
-            document.getElementById('spreadsheetContainer').style.display = dados.length > 0 ? 'block' : 'none';
-        }
-
-        function editarCelula(cell, index, campo) {
-            if (editingCell) return;
-
-            editingCell = cell;
-            const valorAtual = dados[index][campo];
-            
-            const input = document.createElement('input');
-            input.className = 'edit-input';
-            input.value = valorAtual !== null ? valorAtual : '';
-            input.type = campo === 'nematoides' ? 'number' : 'text';
-
-            cell.innerHTML = '';
-            cell.appendChild(input);
-            input.focus();
-            input.select();
-
-            function finalizarEdicao() {
-                if (!editingCell) return; // Avoid issues if already finalized
-                let novoValor = input.value.trim();
-                
-                if (campo === 'peso') {
-                    novoValor = formatarPeso(novoValor);
-                } else if (campo === 'nematoides') {
-                    novoValor = novoValor && novoValor.match(/^\d+$/) ? parseInt(novoValor) : null;
-                }
-
-                dados[index][campo] = novoValor;
-                cell.innerHTML = novoValor !== null ? novoValor : '';
-                editingCell = null;
-                input.removeEventListener('blur', finalizarEdicao); // Clean up
-                input.removeEventListener('keypress', handleEditKeyPress); // Clean up
-            }
-
-            function handleEditKeyPress(e) {
-                if (e.key === 'Enter') {
-                    finalizarEdicao();
-                } else if (e.key === 'Escape') { // Allow Esc to cancel edit
-                    cell.innerHTML = valorAtual !== null ? valorAtual : '';
-                    editingCell = null;
-                    input.removeEventListener('blur', finalizarEdicao);
-                    input.removeEventListener('keypress', handleEditKeyPress);
-                }
-            }
-
-            input.addEventListener('blur', finalizarEdicao);
-            input.addEventListener('keypress', handleEditKeyPress);
-        }
-
-        function exportarExcel() {
-            if (dados.length === 0) {
-                mostrarMensagem('Nenhum dado para exportar.', 'error');
-                return;
-            }
-
-            const nomeArquivo = document.getElementById('nomeArquivo').value.trim() || 'dados_clones';
-            
-            const dadosExportacao = [
-                ['Clones', 'Rep', 'Peso g (casca+raiz)', 'Nematoides totais', 'Nema/g', 'FR']
-            ];
-
-            dados.forEach(item => {
-                dadosExportacao.push([
-                    item.clone,
-                    item.rep,
-                    item.peso,
-                    item.nematoides,
-                    item.nemaG,
-                    item.fr
-                ]);
-            });
-
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(dadosExportacao);
-
-            const range = XLSX.utils.decode_range(ws['!ref']);
-            for (let C = range.s.c; C <= range.e.c; ++C) {
-                const address = XLSX.utils.encode_cell({ r: 0, c: C });
-                if (!ws[address]) continue;
-                ws[address].s = {
-                    font: { bold: true, color: { rgb: "FFFFFFFF" } }, // White text
-                    fill: { fgColor: { rgb: "FF4facfe" } }, // Blue background
-                    alignment: { horizontal: 'center' }
-                };
-            }
-            // Style for dark theme compatibility
-            if (document.documentElement.getAttribute('data-theme') === 'dark') {
-                 for (let C = range.s.c; C <= range.e.c; ++C) {
-                    const address = XLSX.utils.encode_cell({ r: 0, c: C });
-                    if (!ws[address]) continue;
-                    ws[address].s.fill.fgColor.rgb = "FF9055A2"; // Purpureus
-                    ws[address].s.font.color.rgb = "FF011638"; // Oxford Blue text
-                 }
-            }
-
-
-            const colWidths = [
-                { wch: 15 }, { wch: 8 }, { wch: 20 }, { wch: 18 }, { wch: 12 }, { wch: 8 }
-            ];
-            ws['!cols'] = colWidths;
-
-            XLSX.utils.book_append_sheet(wb, ws, 'Dados');
-            XLSX.writeFile(wb, `${nomeArquivo.replace(/\s+/g, '_')}.xlsx`);
-
-            mostrarMensagem('Arquivo Excel exportado com sucesso!', 'success');
-        }
-
-        function limparDados() {
-            if (confirm('⚠️ Tem certeza que deseja limpar todos os dados? Esta ação não pode ser desfeita.')) {
-                dados = [];
-                atualizarTabela();
-                mostrarMensagem('Dados limpos com sucesso!', 'success');
-            }
-        }
-
-        function mostrarMensagem(texto, tipo) {
-            const container = document.getElementById('statusMessage');
-            container.innerHTML = `<div class="status-message ${tipo}">${texto}</div>`;
-            
-            setTimeout(() => {
-                if (container.firstChild && container.firstChild.textContent === texto) { // Only clear if it's the same message
-                    container.innerHTML = '';
-                }
-            }, 4000);
-        }
-
-        document.getElementById('ano').addEventListener('input', function() {
-            this.value = this.value.replace(/\D/g, '');
-        });
-
-        document.getElementById('pais').addEventListener('input', function() {
-            this.value = this.value.replace(/\D/g, '');
-        });
-
-        document.getElementById('numeroClone').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                adicionarClone();
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            mostrarMensagem('🚀 Sistema iniciado! Preencha as configurações e comece a adicionar clones.', 'success');
-        });
-    </script>
+    <script src="script.js" defer></script>
 </body>
 </html>
