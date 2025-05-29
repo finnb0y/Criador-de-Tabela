@@ -660,6 +660,16 @@ function processarMultiplicacao() {
     }
     const columnIndex = parseInt(columnIndexStr);
 
+    // Obter o fator de multiplicação do novo campo
+    const factorInput = document.getElementById('multiplicationFactor');
+    let multiplicationFactor = parseInt(factorInput.value);
+
+    if (isNaN(multiplicationFactor) || multiplicationFactor < 1) {
+        mostrarMensagem('Fator de multiplicação inválido. Usando 1 como padrão.', 'warning', 'multiplicadorStatusMessage');
+        multiplicationFactor = 1; // Valor padrão ou de fallback
+        factorInput.value = 1; // Atualiza o campo na UI
+    }
+
     const dataToProcess = multiplicatorSelectedSheetData;
 
     if (!dataToProcess || dataToProcess.length === 0) {
@@ -675,11 +685,7 @@ function processarMultiplicacao() {
         return;
     }
 
-    // Check if columnIndex is valid for the data (some rows might have fewer columns)
-    // We use the first row's header for the multiplied data title, so check against that too.
     const firstRow = dataToProcess[0] || [];
-    // No need to check columnIndex against firstRow.length here if populateColumnSelectorWithOptions is robust
-    // as the column index should be valid if it was selectable.
 
     let startLineUser = parseInt(startRowSelector.value);
     let endLineUser = parseInt(endRowSelector.value);
@@ -700,9 +706,11 @@ function processarMultiplicacao() {
     endRowSelector.value = endLineUser;
 
     let headerOfSelectedColumnText = `Coluna ${columnIndexToLetter(columnIndex)}`;
-    if (firstRow[columnIndex] !== null && firstRow[columnIndex] !== undefined && String(firstRow[columnIndex]).trim() !== '') {
+    // Certifique-se de que firstRow existe e tem o columnIndex antes de acessá-lo
+    if (firstRow.length > columnIndex && firstRow[columnIndex] !== null && firstRow[columnIndex] !== undefined && String(firstRow[columnIndex]).trim() !== '') {
         headerOfSelectedColumnText += ` (${String(firstRow[columnIndex]).trim()})`;
     }
+
 
     multiplicatorMultipliedData = [];
 
@@ -713,7 +721,8 @@ function processarMultiplicacao() {
         if (row && columnIndex < row.length) { // Ensure row has this column
             const value = row[columnIndex];
             if (value !== undefined && value !== null && String(value).trim() !== '') {
-                for (let j = 0; j < 4; j++) {
+                // Use o multiplicationFactor do usuário aqui
+                for (let j = 0; j < multiplicationFactor; j++) {
                     multiplicatorMultipliedData.push(value);
                 }
             }
@@ -726,7 +735,7 @@ function processarMultiplicacao() {
         return;
     }
 
-    const multipliedHeaders = [`Valores Multiplicados de ${headerOfSelectedColumnText}`];
+    const multipliedHeaders = [`Valores Multiplicados (x${multiplicationFactor}) de ${headerOfSelectedColumnText}`]; // Atualiza o título
     const multipliedDataAsRows = multiplicatorMultipliedData.map(val => [val]);
 
     renderHtmlTable(multipliedDataTableHead, multipliedDataTableBody, multipliedHeaders, multipliedDataAsRows);
@@ -755,6 +764,14 @@ function exportarDadosMultiplicados() {
     const fileName = `dados_multiplicados_${selectedColumnNameForFile.replace(/[^\w.-]+/g, '_')}.xlsx`;
     
     let headerTextForSheet = `Valores Multiplicados`;
+    const factorInput = document.getElementById('multiplicationFactor'); // Pega o fator para o header
+    let multiplicationFactor = parseInt(factorInput.value);
+    if (isNaN(multiplicationFactor) || multiplicationFactor < 1) {
+        multiplicationFactor = 1; // Fallback se não for válido
+    }
+    headerTextForSheet += ` (x${multiplicationFactor})`;
+
+
     if (!isNaN(colIdx)) {
          headerTextForSheet += ` (Coluna ${columnIndexToLetter(colIdx)}`;
          if (multiplicatorSelectedSheetData && multiplicatorSelectedSheetData[0] && colIdx < multiplicatorSelectedSheetData[0].length &&
