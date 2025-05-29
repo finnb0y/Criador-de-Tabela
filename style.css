@@ -56,6 +56,12 @@
     --modal-input-bg: white;
     --modal-input-text: #333;
     --modal-input-border: #ddd;
+    --drop-zone-border: #ccc;
+    --drop-zone-bg: var(--form-group-bg);
+    --drop-zone-border-hover: #aaa;
+    --drop-zone-border-drop: #4CAF50;
+    --drop-zone-bg-drop: #e6ffe6;
+
 
     /* Dark Theme Palette Variables */
     --oxford-blue: #011638ff;
@@ -86,12 +92,7 @@
     --btn-primary-gradient: linear-gradient(135deg, var(--purpureus) 0%, var(--lilac) 100%);
     --btn-primary-text: var(--oxford-blue);
     --btn-primary-shadow-hover: 0 5px 15px rgba(144, 85, 162, 0.4);
-    --btn-success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%); /* Keep success colors for contrast */
-    --btn-success-text: white;
-    --btn-success-shadow-hover: 0 5px 15px rgba(86, 171, 47, 0.4);
-    --btn-export-gradient: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%); /* Keep export colors for contrast */
-    --btn-export-text: white;
-    --btn-export-shadow-hover: 0 5px 15px rgba(255, 107, 107, 0.4);
+    /* Success and Export buttons retain their original colors for strong visual cues */
     --spreadsheet-container-bg: var(--space-cadet);
     --spreadsheet-header-gradient: linear-gradient(135deg, var(--oxford-blue) 0%, var(--space-cadet) 100%);
     --spreadsheet-header-text: var(--tea-rose-red);
@@ -100,13 +101,13 @@
     --table-border-bottom: var(--purpureus);
     --table-td-border-bottom: var(--purpureus);
     --table-td-hover-bg: var(--oxford-blue);
-    --editable-bg: var(--space-cadet); /* Adjust if needed for better visibility */
+    --editable-bg: var(--space-cadet); 
     --editable-hover-bg: var(--oxford-blue);
     --edit-input-border: var(--lilac);
-    --status-success-bg: #103d1c; /* Darker success */
+    --status-success-bg: #103d1c; 
     --status-success-text: #a8e6cf;
     --status-success-border: #56ab2f;
-    --status-error-bg: #5a1218; /* Darker error */
+    --status-error-bg: #5a1218;
     --status-error-text: #ffa8a8;
     --status-error-border: #ff6b6b;
     --fab-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
@@ -115,6 +116,11 @@
     --modal-input-bg: var(--oxford-blue);
     --modal-input-text: var(--tea-rose-red);
     --modal-input-border: var(--purpureus);
+    --drop-zone-border: var(--purpureus);
+    --drop-zone-bg: var(--oxford-blue);
+    --drop-zone-border-hover: var(--lilac);
+    --drop-zone-border-drop: var(--tea-rose-red);
+    --drop-zone-bg-drop: var(--space-cadet);
 }
 
 
@@ -129,13 +135,13 @@ body {
     background: var(--bg-gradient);
     min-height: 100vh;
     padding: 20px;
-    color: var(--form-group-text); /* Default text color for body */
+    color: var(--form-group-text); 
     transition: background 0.3s ease, color 0.3s ease;
 }
 
 .container {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 20px auto; /* Added margin top/bottom for spacing */
     background: var(--container-bg);
     border-radius: 20px;
     box-shadow: var(--container-shadow);
@@ -191,7 +197,7 @@ body {
     font-family: var(--font-heading-sub);
     color: var(--form-group-text);
     margin-bottom: 20px;
-    font-size: 1.6rem; /* Bebas Neue is taller */
+    font-size: 1.6rem; 
     letter-spacing: 1px;
     display: flex;
     align-items: center;
@@ -205,18 +211,28 @@ body {
 
 .input-row {
     display: flex;
-    gap: 15px;
+    flex-direction: column; /* Stack label and input on small screens */
+    gap: 8px; /* Reduced gap for stacked layout */
     margin-bottom: 15px;
-    align-items: center;
+    align-items: stretch; /* Make input take full width */
 }
+
+@media (min-width: 500px) { /* Apply row layout for wider screens */
+    .input-row {
+        flex-direction: row;
+        gap: 15px;
+        align-items: center;
+    }
+}
+
 
 label {
     font-weight: 600;
     color: var(--label-text);
-    min-width: 120px;
+    min-width: 120px; /* Effective in row layout */
 }
 
-input {
+input[type="text"], input[type="number"], select.data-input { /* Added select targeting */
     flex: 1;
     padding: 12px 15px;
     border: 2px solid var(--input-border);
@@ -225,13 +241,35 @@ input {
     background-color: var(--input-bg);
     color: var(--input-text);
     transition: all 0.3s ease;
+    width: 100%; /* Ensure full width in column layout */
 }
-
-input:focus {
+input[type="text"]:focus, input[type="number"]:focus, select.data-input:focus {
     outline: none;
     border-color: var(--input-border-focus);
     box-shadow: var(--input-focus-shadow);
 }
+/* Input file specific styles */
+input[type="file"] {
+    padding: 10px;
+    border: 2px solid var(--input-border);
+    border-radius: 10px;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    cursor: pointer;
+}
+input[type="file"]::-webkit-file-upload-button {
+    background: var(--btn-primary-gradient);
+    color: var(--btn-primary-text);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font-heading-sub);
+}
+input[type="file"]:hover::-webkit-file-upload-button {
+    opacity: 0.9;
+}
+
 
 .clone-section {
     background: var(--clone-section-bg);
@@ -244,41 +282,29 @@ input:focus {
 
 .clone-section h4 {
     font-family: var(--font-heading-sub);
-    color: var(--form-group-text); /* Use same as form-group for consistency */
+    color: var(--form-group-text); 
     margin-bottom: 20px;
-    font-size: 1.4rem; /* Bebas Neue */
+    font-size: 1.4rem; 
     letter-spacing: 0.5px;
 }
 
 .data-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Responsive grid */
     gap: 12px;
     margin-bottom: 15px;
 }
 
-.data-grid-horizontal {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 15px;
-}
 
-@media (max-width: 640px) {
-    .data-grid-horizontal {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
-}
-
-.data-input {
+.data-input { /* Styles for inputs inside modal's data-grid or general data inputs */
     padding: 10px;
-    border: 2px solid var(--modal-input-border); /* Changed from #ddd */
+    border: 2px solid var(--modal-input-border); 
     border-radius: 8px;
     text-align: center;
     font-size: 0.9rem;
     background-color: var(--modal-input-bg);
     color: var(--modal-input-text);
+    width: 100%; /* ensure they take up grid cell space */
 }
 
 .btn {
@@ -291,14 +317,13 @@ input:focus {
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    font-family: var(--font-heading-sub); /* Bebas Neue for buttons */
+    font-family: var(--font-heading-sub); 
 }
 
 .btn-primary {
     background: var(--btn-primary-gradient);
     color: var(--btn-primary-text);
 }
-
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: var(--btn-primary-shadow-hover);
@@ -308,31 +333,26 @@ input:focus {
     background: var(--btn-success-gradient);
     color: var(--btn-success-text);
 }
-
 .btn-success:hover {
     transform: translateY(-2px);
     box-shadow: var(--btn-success-shadow-hover);
 }
 
-.btn-export {
-    background: var(--btn-export-gradient);
-    color: var(--btn-export-text);
-    margin-left: 10px;
-}
-
-.btn-export:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--btn-export-shadow-hover);
-}
-
 .spreadsheet-container {
     background: var(--spreadsheet-container-bg);
     border-radius: 15px;
-    overflow: hidden;
+    overflow: hidden; /* This will be overridden for table wrapper */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     margin-top: 30px;
     transition: background-color 0.3s ease;
 }
+/* Wrapper for responsive tables */
+.table-responsive-wrapper {
+    max-height: 400px; /* Example max height */
+    overflow: auto;   /* Enables scrolling */
+    border-radius: 0 0 15px 15px; /* Match container if header is separate */
+}
+
 
 .spreadsheet-header {
     background: var(--spreadsheet-header-gradient);
@@ -340,11 +360,12 @@ input:focus {
     padding: 20px;
     text-align: center;
     transition: background 0.3s ease, color 0.3s ease;
+    border-radius: 15px 15px 0 0; /* Round top corners */
 }
 
 .spreadsheet-header h3 {
     font-family: var(--font-heading-sub);
-    font-size: 1.8rem; /* Bebas Neue */
+    font-size: 1.8rem; 
     letter-spacing: 1px;
     margin-bottom: 5px;
 }
@@ -353,6 +374,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.9rem;
+    background-color: var(--spreadsheet-container-bg); /* Ensure table bg matches */
 }
 
 th {
@@ -362,16 +384,19 @@ th {
     font-weight: 600;
     color: var(--table-th-text);
     border-bottom: 2px solid var(--table-border-bottom);
-    font-family: var(--font-heading-sub); /* Bebas Neue for table headers */
+    font-family: var(--font-heading-sub); 
     letter-spacing: 0.5px;
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    position: sticky; /* Sticky header for scrolling table */
+    top: 0;           /* Stick to the top of the scrollable container */
+    z-index: 10;      /* Ensure header is above table content */
 }
 
 td {
     padding: 12px 10px;
     text-align: center;
     border-bottom: 1px solid var(--table-td-border-bottom);
-    color: var(--form-group-text); /* Use general text color */
+    color: var(--form-group-text); 
     transition: all 0.2s ease;
     cursor: pointer;
 }
@@ -384,7 +409,6 @@ td:hover {
     background: var(--editable-bg);
     font-weight: bold;
 }
-
 .editable:hover {
     background: var(--editable-hover-bg);
 }
@@ -396,7 +420,7 @@ td:hover {
     border-radius: 4px;
     text-align: center;
     font-size: 0.9rem;
-    background-color: var(--input-bg); /* Same as general inputs */
+    background-color: var(--input-bg); 
     color: var(--input-text);
 }
 
@@ -408,13 +432,11 @@ td:hover {
     font-weight: 600;
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
-
 .success {
     background: var(--status-success-bg);
     color: var(--status-success-text);
     border: 1px solid var(--status-success-border);
 }
-
 .error {
     background: var(--status-error-bg);
     color: var(--status-error-text);
@@ -444,12 +466,10 @@ td:hover {
     align-items: center;
     justify-content: center;
 }
-
 .fab:hover {
     transform: scale(1.1);
 }
 
-/* Theme toggle button specific style */
 .btn-theme-toggle {
     background: var(--btn-primary-gradient);
     color: var(--btn-primary-text);
@@ -459,47 +479,90 @@ td:hover {
 }
 
 
-/* Modal specific styles using CSS variables */
+/* Modal specific styles */
+.modal-backdrop { /* Style for the semi-transparent background */
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); display: flex; align-items: center;
+    justify-content: center; z-index: 2000; padding: 20px;
+    box-sizing: border-box; overflow-y: auto;
+}
+
 .modal-content {
-    background: var(--modal-bg) !important; /* Override inline style */
-    padding: 25px; 
+    background: var(--modal-bg); /* Use CSS variable */
+    padding: 30px; 
     border-radius: 20px; 
-    max-width: 550px; 
+    max-width: 600px; /* Increased max-width */
     width: 100%; 
     max-height: 90vh;
     overflow-y: auto;
     margin: auto;
     box-sizing: border-box;
     transition: background-color 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 .modal-content h3, .modal-content h4 {
-    color: var(--modal-text) !important; /* Override inline style */
+    color: var(--modal-text); 
     font-family: var(--font-heading-sub);
+    text-align: center;
+    margin-bottom: 20px;
 }
-.modal-content h3 { font-size: 1.5rem; letter-spacing: 0.5px;}
-.modal-content h4 { font-size: 1.3rem; letter-spacing: 0.5px;}
+.modal-content h3 { font-size: 1.7rem; letter-spacing: 0.5px;}
+.modal-content h4 { font-size: 1.4rem; letter-spacing: 0.5px; margin-top: 20px; margin-bottom: 10px;}
+
+
+/* Styles for Multiplier View */
+.drop-zone {
+    border: 3px dashed var(--drop-zone-border);
+    padding: 30px;
+    text-align: center;
+    margin-bottom: 20px;
+    background-color: var(--drop-zone-bg);
+    border-radius: 15px;
+    color: var(--label-text);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.drop-zone.hover {
+    border-color: var(--drop-zone-border-hover);
+    transform: scale(1.02);
+}
+.drop-zone.drop {
+    border-color: var(--drop-zone-border-drop);
+    background-color: var(--drop-zone-bg-drop);
+}
 
 
 @media (max-width: 768px) {
     .form-section {
         grid-template-columns: 1fr;
     }
-    
     .data-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
+        grid-template-columns: 1fr; /* Simpler grid for modal on small screens */
     }
-
-    .data-grid-horizontal {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
     .header h1 {
         font-size: 2rem;
     }
-    
     .main-content {
         padding: 20px;
+    }
+    .modal-content {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 640px) {
+    .data-grid { /* For modal inputs */
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 8px;
+    }
+    .floating-buttons {
+        right: 20px;
+        bottom: 20px;
+    }
+    .fab {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
     }
 }
